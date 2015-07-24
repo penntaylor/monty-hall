@@ -11,16 +11,6 @@ NUM_DOORS = 5  # Standard problem has 3
 MAX_CHOICES = NUM_DOORS - 1
 
 
-# The basic idea here is that for each trial, we keep track of the
-# location of the prize, the doors available for switching to, and the
-# choice history. After every reveal (when Monty Hall opens a door),
-# we call into the passed switch_strategy_block to determine which door
-# the contestant chooses (options are always to either stay with current
-# door or switch to one of the available_switches).
-#
-# After each trial, we check the location of the prize against the choice
-# history, and track statistics of where the prize was.
-#
 # Note that MAX_CHOICES includes the initial guess, and that in the
 # choices array, the *initial guess* is always the first
 # entry. So if there are N chances to switch or stay, there will be N+1
