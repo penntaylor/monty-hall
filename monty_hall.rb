@@ -76,7 +76,7 @@ end
 #### Strategies ####
 #
 # Strategies should take in the array of previous choices,
-# the array of availbale choices, and the reveal number, and should
+# the array of available choices, and the reveal number, and should
 # return the new choice without altering any of the arrays. Reveal numbers
 # are 1-based, so take that into account if using them to address array
 # indices.
@@ -127,15 +127,17 @@ end
 
 
 #### Running and reporting ####
+@rankings = []
 
 def report(strategy_name, &strategy)
   chosen, other, choice_count = run_sim(&strategy)
   cbd = choice_count.map{|c| Float(c) / Float(TRIALS)}
   puts ""
   puts "Strategy: #{strategy_name}"
-  puts "  Prize behind chosen door: #{chosen} (#{Float(chosen) / Float(TRIALS)})"
-  puts "  Prize behind other door:  #{other}  (#{Float(other) / Float(TRIALS)})"
+  puts "  Success: #{chosen} (#{Float(chosen) / Float(TRIALS)})"
+  puts "  Failure:  #{other}  (#{Float(other) / Float(TRIALS)})"
   puts "  Choice breakdown: #{cbd}"
+  @rankings << [strategy_name, Float(chosen) / Float(TRIALS)]
 end
 
 
@@ -148,9 +150,13 @@ puts "each of the chosen doors, starting on the left with the original guess,"
 puts "and showing the final choice on the far right."
 
 
+# Define and run all possible stay/switch possibilities given
+# the number of choices available
 max_switches = MAX_CHOICES - 1
-all_strategies = (['stay'] * (max_switches) + ['switch'] * (max_switches)).
-  permutation(max_switches).to_a.uniq
+
+all_strategies = ['stay','switch'].repeated_permutation(max_switches).to_a
+
+puts "\nThere are #{all_strategies.size} auto-generated unique strategies."
 
 all_strategies.each do |strategy|
   strat_str = strategy.join('_')
@@ -158,5 +164,11 @@ all_strategies.each do |strategy|
   report(strat_str, &method(strat_str.to_sym))
 end
 
+# Manually report any additional strategies
 report("never repeat", &method(:never_repeat))
 report("return to original door at end if available", &method(:never_repeat_and_return_to_original_if_available_at_end))
+
+@rankings = @rankings.sort_by{|a| a.last}
+puts ""
+puts "Ranked results, least effective to most effective:"
+@rankings.each{|r| puts r.inspect}
